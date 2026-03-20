@@ -43,7 +43,8 @@ A high-performance, secure task management application built to demonstrate mode
    ```bash
    npm run dev
 
-**📐 Architecture Note**
+##📐 Architecture Note
+
 This project follows a DAL (Data Access Layer) pattern. Database logic is isolated from UI components, ensuring that server-side logic never leaks to the client-side bundle through the use of the "use server" and strict boundary management.
 
    
