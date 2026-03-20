@@ -1,8 +1,11 @@
+import { decrypt } from "./lib/session";
 import { NextRequest, NextResponse } from "next/server";
 
 // --- 2. THE PROXY LOGIC (Routing/Filtering) ---
 export default async function proxy(request: NextRequest) {
-  const session = request.cookies.get("session")?.value;
+  const cookie = request.cookies.get("session")?.value;
+  const session = await decrypt(cookie);
+
   const { pathname } = request.nextUrl;
 
   // Protect the Dashboard (Home)
