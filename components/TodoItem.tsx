@@ -3,7 +3,7 @@ import { Trash2, Check } from "lucide-react";
 import { deleteTodo, updateTodo } from "@/actions/todo";
 
 interface TodoProps {
-  id: number;
+  id: string;
   content: string;
   completed: boolean;
 }

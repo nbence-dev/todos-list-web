@@ -1,9 +1,9 @@
 import { TodoItem } from "./TodoItem";
 
 interface Todo {
-  id: number;
+  id: string;
   content: string;
-  userId: number;
+  userId: string;
   completed: boolean;
 }
 
