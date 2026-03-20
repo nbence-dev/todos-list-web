@@ -4,6 +4,7 @@ interface Todo {
   id: number;
   content: string;
   userId: number;
+  completed: boolean;
 }
 
 export default function TodoList({ todos }: { todos: Todo[] }) {
@@ -35,7 +36,12 @@ export default function TodoList({ todos }: { todos: Todo[] }) {
   return (
     <div className="space-y-3 mt-6">
       {todos.map((todo) => (
-        <TodoItem key={todo.id} content={todo.content} />
+        <TodoItem
+          key={todo.id}
+          id={todo.id}
+          content={todo.content}
+          completed={todo.completed}
+        />
       ))}
     </div>
   );

@@ -6,13 +6,14 @@ import { Plus } from "lucide-react";
 
 export function TodoForm() {
   const formRef = useRef<HTMLFormElement>(null);
+  const handleCreateTodo = async (formData: FormData) => {
+    await createTodo(formData);
+    formRef.current?.reset();
+  };
 
   return (
     <form
-      action={async (formData) => {
-        await createTodo(formData);
-        formRef.current?.reset();
-      }}
+      action={handleCreateTodo}
       className="group relative flex items-center mb-6"
     >
       <div className="absolute left-4 text-slate-400 group-focus-within:text-slate-600 transition-colors">
