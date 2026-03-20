@@ -18,7 +18,7 @@ export async function createTodo(formData: FormData) {
   }
 }
 
-export async function deleteTodo(id: number) {
+export async function deleteTodo(id: string) {
   try {
     const userId = await getUserId();
     await deleteTodoInDb(id, userId);
@@ -28,7 +28,7 @@ export async function deleteTodo(id: number) {
   }
 }
 
-export async function updateTodo(id: number, currentStatus: boolean) {
+export async function updateTodo(id: string, currentStatus: boolean) {
   try {
     const userId = await getUserId();
     await updateTodoInDb(id, !currentStatus, userId);

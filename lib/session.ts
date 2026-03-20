@@ -5,7 +5,7 @@ import { SignJWT, jwtVerify } from "jose";
 const secretKey = process.env.JWT_SECRET_KEY;
 const encodedKey = new TextEncoder().encode(secretKey);
 
-export async function createSession(userId: number) {
+export async function createSession(userId: string) {
   const expiresAt = new Date(Date.now() + 24 * 60 * 60 * 1000);
 
   const session = await new SignJWT({ userId })
@@ -49,5 +49,5 @@ export async function getUserId() {
     throw new Error("Unauthorized");
   }
 
-  return Number(payload.userId);
+  return String(payload.userId);
 }

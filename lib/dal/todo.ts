@@ -5,7 +5,7 @@ import { todos } from "@/db/schema";
 import { eq, desc, and } from "drizzle-orm";
 import { getUserId } from "../session";
 
-export async function createTodoInDb(content: string, userId: number) {
+export async function createTodoInDb(content: string, userId: string) {
   return await db.insert(todos).values({ content, userId });
 }
 
@@ -18,16 +18,16 @@ export async function getTodos() {
     .orderBy(desc(todos.createdAt));
 }
 
-export async function deleteTodoInDb(todoId: number, userId: number) {
+export async function deleteTodoInDb(todoId: string, userId: string) {
   return await db
     .delete(todos)
     .where(and(eq(todos.id, todoId), eq(todos.userId, userId)));
 }
 
 export async function updateTodoInDb(
-  todoId: number,
+  todoId: string,
   completed: boolean,
-  userId: number,
+  userId: string,
 ) {
   return await db
     .update(todos)

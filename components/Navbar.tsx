@@ -17,7 +17,7 @@ export function Navbar({ userEmail }: NavbarProps) {
             <CheckSquare size={20} />
           </div>
           <h1 className="font-bold text-slate-900 tracking-tight text-lg">
-            TodoApp
+            Velocity
           </h1>
         </div>
 
