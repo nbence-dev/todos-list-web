@@ -4,7 +4,7 @@ import { AuthSchema } from "@/lib/validation";
 import bcrypt from "bcryptjs";
 import { redirect } from "next/navigation";
 import { createUser, getUserByEmail } from "@/lib/dal/auth";
-import { createSession, deleteSession, getUserId } from "@/lib/session";
+import { createSession, deleteSession } from "@/lib/session";
 
 export async function registerUser(formData: FormData) {
   const email = formData.get("email");
@@ -59,5 +59,5 @@ export async function logoutUser() {
   } catch (error) {
     return { error: "Server error" };
   }
-  redirect("/login");
+  redirect("/");
 }
