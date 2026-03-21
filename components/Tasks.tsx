@@ -1,7 +1,7 @@
 "use client";
 
 import { createTodo, deleteTodo, updateTodo } from "@/actions/todo";
-import { useOptimistic, useTransition } from "react";
+import { useOptimistic, useTransition, useState } from "react";
 import { TodoForm } from "./TodoForm";
 import TodoList from "./TodoList";
 
@@ -13,7 +13,9 @@ interface Todo {
 }
 
 export function Tasks({ todos: initialTodos }: { todos: Todo[] }) {
-  const [isPending, startTransition] = useTransition();
+  const [, startTransition] = useTransition();
+  const [pendingIds, setPendingIds] = useState<Set<string>>(new Set());
+  const [isAddingTodo, setIsAddingTodo] = useState(false);
 
   const [optimisticTodos, addOptimisticTodo] = useOptimistic(
     initialTodos,
@@ -59,29 +61,69 @@ export function Tasks({ todos: initialTodos }: { todos: Todo[] }) {
     },
   );
 
+  const isItemPending = (id: string) => pendingIds.has(id);
+
   const handleAddTodo = async (formData: FormData) => {
     const content = formData.get("content") as string;
     if (!content.trim()) return;
+
+    // Throttle: prevent spamming multiple adds (300ms debounce)
+    if (isAddingTodo) return;
+
+    setIsAddingTodo(true);
+    const tempId = `temp-${Date.now()}`;
+    setPendingIds((prev) => new Set(prev).add(tempId));
 
     startTransition(() => {
       addOptimisticTodo({ action: "add", content });
     });
 
-    await createTodo(formData);
+    try {
+      await createTodo(formData);
+    } finally {
+      setPendingIds((prev) => {
+        const next = new Set(prev);
+        next.delete(tempId);
+        return next;
+      });
+    }
+
+    // Re-enable form after 300ms
+    setTimeout(() => {
+      setIsAddingTodo(false);
+    }, 300);
   };
 
   const handleToggle = async (id: string, currentStatus: boolean) => {
+    setPendingIds((prev) => new Set(prev).add(id));
+
     startTransition(() => {
       addOptimisticTodo({ action: "toggle", id, completed: !currentStatus });
     });
+
     await updateTodo(id, currentStatus);
+
+    setPendingIds((prev) => {
+      const next = new Set(prev);
+      next.delete(id);
+      return next;
+    });
   };
 
   const handleDelete = async (id: string) => {
+    setPendingIds((prev) => new Set(prev).add(id));
+
     startTransition(() => {
       addOptimisticTodo({ action: "delete", id });
     });
+
     await deleteTodo(id);
+
+    setPendingIds((prev) => {
+      const next = new Set(prev);
+      next.delete(id);
+      return next;
+    });
   };
 
   const activeCount = optimisticTodos.filter((todo) => !todo.completed).length;
@@ -101,12 +143,12 @@ export function Tasks({ todos: initialTodos }: { todos: Todo[] }) {
         </header>
 
         <div className="bg-white rounded-xl border border-slate-200 shadow-sm p-6">
-          <TodoForm onAddTodo={handleAddTodo} />
+          <TodoForm onAddTodo={handleAddTodo} isAdding={isAddingTodo} />
           <TodoList
             todos={optimisticTodos}
             onToggle={handleToggle}
             onDelete={handleDelete}
-            isPending={isPending}
+            isItemPending={isItemPending}
           />
         </div>
       </div>

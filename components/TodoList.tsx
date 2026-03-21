@@ -12,14 +12,14 @@ interface TodoListProps {
   todos: Todo[];
   onToggle: (id: string, currentStatus: boolean) => void;
   onDelete: (id: string) => void;
-  isPending: boolean;
+  isItemPending: (id: string) => boolean;
 }
 
 export default function TodoList({
   todos,
   onToggle,
   onDelete,
-  isPending,
+  isItemPending,
 }: TodoListProps) {
   if (todos.length === 0) {
     return (
@@ -56,7 +56,7 @@ export default function TodoList({
           completed={todo.completed}
           onToggle={() => onToggle(todo.id, todo.completed)}
           onDelete={() => onDelete(todo.id)}
-          isPending={isPending}
+          isPending={isItemPending(todo.id)}
         />
       ))}
     </div>
