@@ -1,6 +1,6 @@
 "use client";
 
-import { LogOut, CheckSquare, Loader2 } from "lucide-react";
+import { LogOut, CheckSquare } from "lucide-react";
 import { logoutUser } from "@/actions/auth";
 import { useTransition } from "react";
 

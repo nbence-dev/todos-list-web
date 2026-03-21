@@ -1,13 +1,16 @@
 "use client";
 
-import { createTodo } from "@/actions/todo";
 import { useRef } from "react";
 import { Plus } from "lucide-react";
 
-export function TodoForm() {
+interface TodoFormProps {
+  onAddTodo: (formData: FormData) => Promise<void>;
+}
+
+export function TodoForm({ onAddTodo }: TodoFormProps) {
   const formRef = useRef<HTMLFormElement>(null);
   const handleCreateTodo = async (formData: FormData) => {
-    await createTodo(formData);
+    await onAddTodo(formData);
     formRef.current?.reset();
   };
 
