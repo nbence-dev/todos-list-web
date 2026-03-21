@@ -1,4 +1,7 @@
+"use client";
+import { deleteTodo, updateTodo } from "@/actions/todo";
 import { TodoItem } from "./TodoItem";
+import { useOptimistic, useTransition } from "react";
 
 interface Todo {
   id: string;
@@ -8,7 +11,44 @@ interface Todo {
 }
 
 export default function TodoList({ todos }: { todos: Todo[] }) {
-  if (todos.length === 0) {
+  const [isPending, startTransition] = useTransition();
+  const [optimisticTodos, addOptimisticTodo] = useOptimistic(
+    todos,
+    (
+      state,
+      {
+        action,
+        id,
+        completed,
+      }: { action: "toggle" | "delete"; id: string; completed?: boolean },
+    ) => {
+      if (action == "toggle") {
+        return state.map((t) =>
+          t.id === id ? { ...t, completed: completed! } : t,
+        );
+      }
+      if (action === "delete") {
+        return state.filter((t) => t.id !== id);
+      }
+      return state;
+    },
+  );
+
+  const handleToggle = async (id: string, currentStatus: boolean) => {
+    startTransition(() => {
+      addOptimisticTodo({ action: "toggle", id, completed: !currentStatus });
+    });
+    await updateTodo(id, currentStatus);
+  };
+
+  const handleDelete = async (id: string) => {
+    startTransition(() => {
+      addOptimisticTodo({ action: "delete", id });
+    });
+    await deleteTodo(id);
+  };
+
+  if (optimisticTodos.length === 0) {
     return (
       <div className="flex flex-col items-center justify-center py-12 text-center">
         <div className="flex items-center justify-center w-16 h-16 bg-slate-100 rounded-full mb-4">
@@ -35,12 +75,15 @@ export default function TodoList({ todos }: { todos: Todo[] }) {
   }
   return (
     <div className="space-y-3 mt-6">
-      {todos.map((todo) => (
+      {optimisticTodos.map((todo) => (
         <TodoItem
           key={todo.id}
           id={todo.id}
           content={todo.content}
           completed={todo.completed}
+          onToggle={() => handleToggle(todo.id, todo.completed)}
+          onDelete={() => handleDelete(todo.id)}
+          isPending={isPending}
         />
       ))}
     </div>

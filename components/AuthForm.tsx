@@ -1,25 +1,27 @@
+"use client";
+
 import { useState } from "react";
 import Link from "next/link";
-import { Mail, Lock, Loader2, ArrowRight } from "lucide-react";
+import { Mail, Lock } from "lucide-react";
+import SubmitButton from "./AuthButton";
 
 interface AuthFormProps {
   mode: "login" | "register";
   actionProp: (formData: FormData) => Promise<{ error?: string } | void>;
 }
 
+// 1. Create a sub-component for the button to use useFormStatus
+
 export function AuthForm({ mode, actionProp }: AuthFormProps) {
   const [error, setError] = useState<string | null>(null);
-  const [loading, setLoading] = useState(false);
 
+  // 2. Simplified wrapper
   async function handleAction(formData: FormData) {
-    setLoading(true);
     setError(null);
 
-    // Logic for confirm password check (Client-side only)
     if (mode === "register") {
       if (formData.get("password") !== formData.get("confirmPassword")) {
         setError("Passwords do not match");
-        setLoading(false);
         return;
       }
     }
@@ -27,12 +29,12 @@ export function AuthForm({ mode, actionProp }: AuthFormProps) {
     const result = await actionProp(formData);
     if (result?.error) {
       setError(result.error);
-      setLoading(false);
     }
   }
 
   return (
     <div className="bg-white rounded-2xl border border-slate-200 shadow-sm p-8 w-full">
+      {/* 3. Use the native action prop */}
       <form action={handleAction} className="space-y-5">
         <h2 className="text-2xl font-bold text-slate-900 text-center mb-2">
           {mode === "login" ? "Welcome back" : "Create account"}
@@ -77,7 +79,6 @@ export function AuthForm({ mode, actionProp }: AuthFormProps) {
               placeholder="••••••••"
             />
           </div>
-          <p className="text-xs text-slate-500">Minimum 8 characters</p>
         </div>
 
         {mode === "register" && (
@@ -102,19 +103,8 @@ export function AuthForm({ mode, actionProp }: AuthFormProps) {
           </div>
         )}
 
-        <button
-          disabled={loading}
-          className="w-full bg-slate-900 hover:bg-slate-800 text-white font-semibold py-3 rounded-lg transition-all flex items-center justify-center gap-2"
-        >
-          {loading ? (
-            <Loader2 className="animate-spin" size={20} />
-          ) : (
-            <>
-              {mode === "login" ? "Sign In" : "Get Started"}
-              <ArrowRight size={18} />
-            </>
-          )}
-        </button>
+        {/* 4. The new button handles its own loading state natively */}
+        <SubmitButton mode={mode} />
       </form>
 
       <div className="mt-6 text-center text-sm text-slate-500">

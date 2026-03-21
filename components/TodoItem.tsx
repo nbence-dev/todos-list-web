@@ -6,13 +6,24 @@ interface TodoProps {
   id: string;
   content: string;
   completed: boolean;
+  onToggle: () => void;
+  onDelete: () => void;
+  isPending: boolean;
 }
 
-export function TodoItem({ id, content, completed }: TodoProps) {
+export function TodoItem({
+  id,
+  content,
+  completed,
+  onToggle,
+  onDelete,
+  isPending,
+}: TodoProps) {
   return (
     <div className="group flex items-center gap-3 p-4 mb-3 border border-slate-100 rounded-xl bg-white transition-all hover:border-slate-300 hover:shadow-md">
       <button
-        onClick={() => updateTodo(id, completed)}
+        onClick={onToggle}
+        disabled={isPending}
         className={`h-6 w-6 rounded-full border flex items-center justify-center transition-all
           ${
             completed
@@ -30,7 +41,8 @@ export function TodoItem({ id, content, completed }: TodoProps) {
         {content}
       </span>
       <button
-        onClick={() => deleteTodo(id)}
+        onClick={onDelete}
+        disabled={isPending}
         className="opacity-0 group-hover:opacity-100 p-2 text-slate-400 hover:text-red-500 hover:bg-red-50 rounded-lg transition-all"
       >
         <Trash2 size={18} />
